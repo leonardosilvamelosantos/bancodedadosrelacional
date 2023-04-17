@@ -1,0 +1,81 @@
+drop database if exists db_almox
+;
+create database db_almox character set = 'utf8mb4'
+;
+
+DROP TABLE IF EXISTS requisicao;
+DROP TABLE IF EXISTS compras;
+DROP TABLE IF EXISTS almoxarife;
+DROP TABLE IF EXISTS empregado;
+DROP TABLE IF EXISTS fornecedor;
+DROP TABLE IF EXISTS material;
+
+CREATE TABLE empregado (
+  Num_reg SMALLINT(3) UNSIGNED AUTO_INCREMENT NOT NULL,
+  Nome VARCHAR(45) NOT NULL,
+  Email VARCHAR(30) NOT NULL,
+  Setor VARCHAR(15) NOT NULL,
+  Celular CHAR(11) NOT NULL,
+  Situacao TINYINT NOT NULL,
+  CONSTRAINT pk_empregado PRIMARY KEY (Num_reg)
+) ENGINE='InnoDB';
+
+CREATE TABLE fornecedor (
+  Cnpj CHAR(14) NOT NULL,
+  Nome VARCHAR(45) NOT NULL,
+  Rua VARCHAR(30) NOT NULL,
+  Numero SMALLINT(4) NOT NULL,
+  Bairro VARCHAR(30) NOT NULL,
+  Cidade VARCHAR(20) NOT NULL,
+  Email VARCHAR(30) NOT NULL,
+  Telefone CHAR(11) NOT NULL,
+  CONSTRAINT pk_fornecedor PRIMARY KEY (Cnpj)
+) ENGINE='InnoDB';
+
+CREATE TABLE material (
+  Num_mat INT(4) UNSIGNED AUTO_INCREMENT NOT NULL,
+  Nome VARCHAR(20) NOT NULL,
+  Foto BLOB NOT NULL,
+  Qtd_min SMALLINT(2) UNSIGNED NOT NULL,
+  Qtd_atual INT UNSIGNED NOT NULL,
+  CONSTRAINT pk_material PRIMARY KEY (Num_mat)
+) ENGINE='InnoDB';
+
+CREATE TABLE almoxarife (
+  Num_reg SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+  Nome VARCHAR(45) NOT NULL,
+  Email VARCHAR(30) NOT NULL,
+  Celular CHAR(11) NOT NULL,
+  Situacao TINYINT NOT NULL,
+  CONSTRAINT pk_almoxarife PRIMARY KEY (Num_reg)
+) ENGINE='InnoDB';
+
+CREATE TABLE compras (
+  Num_reg INT UNSIGNED AUTO_INCREMENT NOT NULL,
+  Almox_num_reg SMALLINT UNSIGNED NOT NULL,
+  Mat_num_mat INT(4) UNSIGNED NOT NULL,
+  For_cnpj CHAR(14) NOT NULL,
+  Num_qtd INT UNSIGNED NOT NULL,
+  Vlr_und DECIMAL(8,2) NOT NULL,
+  Vlr_total DECIMAL(9,2) NOT NULL,
+  Data_compra DATE NOT NULL,
+  CONSTRAINT pk_compras PRIMARY KEY (Num_reg),
+  CONSTRAINT fk_compras_almoxarife FOREIGN KEY (Almox_num_reg) REFERENCES almoxarife (Num_reg),
+  CONSTRAINT fk_compras_material FOREIGN KEY (Mat_num_mat) REFERENCES material (Num_mat),
+  CONSTRAINT fk_compras_fornecedor FOREIGN KEY (For_cnpj) REFERENCES fornecedor (Cnpj)
+) ENGINE='InnoDB';
+
+CREATE TABLE requisicao (
+  Num_req INT UNSIGNED AUTO_INCREMENT NOT NULL,
+  Empgd_num_reg SMALLINT(3) UNSIGNED NOT NULL,
+  Almox_num_reg SMALLINT UNSIGNED NOT NULL,
+  Num_mat INT(4) UNSIGNED NOT NULL,
+  Qtd_mat INT UNSIGNED NOT NULL,
+  Situacao SMALLINT UNSIGNED NOT NULL,
+  Data_pedido DATE NOT NULL,
+  Data_entrega DATE NOT NULL,
+  CONSTRAINT pk_requisicao PRIMARY KEY (Num_req),
+  CONSTRAINT fk_requisicao_empregado FOREIGN KEY (Empgd_num_reg) REFERENCES empregado (Num_reg),
+  CONSTRAINT fk_requisicao_almox FOREIGN KEY (Almox_num_reg) REFERENCES almoxarife (Num_reg),
+  CONSTRAINT fk_requisicao_material FOREIGN KEY (Num_mat) REFERENCES material (Num_mat)
+) ENGINE='InnoDB';
